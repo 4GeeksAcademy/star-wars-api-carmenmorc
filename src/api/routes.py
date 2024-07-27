@@ -153,3 +153,69 @@ def get_single_planet(id):
 
 #FAVORITOS
 
+@api.route('/add_favorite/<int:user_id>', methods=['POST'])
+def add_favorite(user_id):
+    data = request.json
+    
+    planet_id = data.get('planet_id')
+    character_id = data.get('character_id')
+    vehicle_id = data.get('vehicle_id')
+    
+    if not any([planet_id, character_id, vehicle_id]):
+        return jsonify({'msg': 'Al menos uno de los campos planet_id, character_id o vehicle_id debe ser proporcionado.'}), 400
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'msg': 'El usuario no existe.'}), 404
+
+    new_favorite = Favorite(
+        user_id=user_id,
+        planet_id=planet_id,
+        character_id=character_id,
+        vehicle_id=vehicle_id
+    )
+    
+    db.session.add(new_favorite)
+    db.session.commit()
+    
+    return jsonify({'msg': 'Favorito creado con éxito.', 'data': new_favorite.serialize()}), 201
+
+
+@api.route('/delete_favorite/<int:user_id>', methods=['DELETE'])
+def delete_favorite(user_id):
+
+    data = request.json
+
+    favorite_id = data.get('favorite_id')
+    if not favorite_id:
+        return jsonify({'msg': 'El campo favorite_id es obligatorio.'}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'msg': 'El usuario no existe.'}), 404
+    
+    favorite = Favorite.query.get(favorite_id)
+    if not favorite:
+        return jsonify({'msg': 'Favorito no encontrado.'}), 404
+    
+    if favorite.user_id != user_id:
+        return jsonify({'msg': 'El favorito no pertenece a este usuario.'}), 403
+    
+    db.session.delete(favorite)
+    db.session.commit()
+    
+    return jsonify({'msg': 'Favorito eliminado con éxito.'}), 200
+
+
+@api.route('/favorites/<int:user_id>', methods=['GET'])
+def get_user_favorites(user_id):
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'msg': 'El usuario no existe.'}), 404
+    
+    favorites = Favorite.query.filter_by(user_id=user_id).all()
+    
+    serialized_favorites = [favorite.serialize() for favorite in favorites]
+    
+    return jsonify({'favorites': serialized_favorites}), 200
