@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Character, Vehicle, Planet
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -57,7 +57,7 @@ def add_user():
     db.session.add(new_user)
     db.session.commit()
     
-    return jsonify({'msg':'Se creó el usuario'}), 200
+    return jsonify({'msg':'Se creó el usuario', 'data' : data}), 200
 
 
 #put 1:04:19
@@ -90,3 +90,65 @@ def edit_user(id):
 
     return jsonify({'msg':'El usuario ha sido editado', 'data':user.serialize()}), 200
 
+
+#PERSONAJES
+
+@api.route('/all_characters', methods=['GET'])
+def get_all_characters():
+    characters = Character.query.all()
+    print(characters)
+    characters = [char.serialize() for char in characters]
+    print(characters)
+    return jsonify({'msg':'OK',
+                    'data' : characters})
+
+
+@api.route('/character/<int:id>', methods=['GET'])
+def get_single_character(id):
+    character = Character.query.get(id)
+    if character:
+        return jsonify({'msg': 'OK', 'data': character.serialize()})
+    else:
+        return jsonify({'msg': 'Character not found'}), 404
+    
+
+#VEHICULOS
+
+@api.route('/all_vehicles', methods=['GET'])
+def get_all_vehicles():
+    vehicles = Vehicle.query.all()
+    print(vehicles)
+    vehicles = [vehi.serialize() for vehi in vehicles]
+    print(vehicles)
+    return jsonify({'msg':'OK',
+                    'data' : vehicles})
+
+
+@api.route('/vehicles/<int:id>', methods=['GET'])
+def get_single_vehicle(id):
+    vehicles = Vehicle.query.get(id)
+    if vehicles:
+        return jsonify({'msg': 'OK', 'data': vehicles.serialize()})
+    else:
+        return jsonify({'msg': 'Vehicle not found'}), 404
+    
+
+#PLANETAS
+
+@api.route('/all_planets', methods=['GET'])
+def get_all_planets():
+    planets = Planet.query.all()
+    print(planets)
+    planets = [pla.serialize() for pla in planets]
+    print(planets)
+    return jsonify({'msg':'OK',
+                    'data' : planets})
+
+
+@api.route('/planets/<int:id>', methods=['GET'])
+def get_single_planet(id):
+    planets = Planet.query.get(id)
+    if planets:
+        return jsonify({'msg': 'OK', 'data': planets.serialize()})
+    else:
+        return jsonify({'msg': 'Planet not found'}), 404
