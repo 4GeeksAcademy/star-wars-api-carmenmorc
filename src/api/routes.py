@@ -162,11 +162,11 @@ def add_favorite(user_id):
     vehicle_id = data.get('vehicle_id')
     
     if not any([planet_id, character_id, vehicle_id]):
-        return jsonify({'msg': 'Al menos uno de los campos planet_id, character_id o vehicle_id debe ser proporcionado.'}), 400
+        return jsonify({'msg': 'At least one of the fields has to be filled'}), 400
     
     user = User.query.get(user_id)
     if not user:
-        return jsonify({'msg': 'El usuario no existe.'}), 404
+        return jsonify({'msg': 'User does not exist'}), 404
 
     new_favorite = Favorite(
         user_id=user_id,
@@ -178,7 +178,7 @@ def add_favorite(user_id):
     db.session.add(new_favorite)
     db.session.commit()
     
-    return jsonify({'msg': 'Favorito creado con éxito.', 'data': new_favorite.serialize()}), 201
+    return jsonify({'msg': 'Success', 'data': new_favorite.serialize()}), 201
 
 
 @api.route('/delete_favorite/<int:user_id>', methods=['DELETE'])
@@ -188,23 +188,23 @@ def delete_favorite(user_id):
 
     favorite_id = data.get('favorite_id')
     if not favorite_id:
-        return jsonify({'msg': 'El campo favorite_id es obligatorio.'}), 400
+        return jsonify({'msg': 'favorite_id is obligatory'}), 400
 
     user = User.query.get(user_id)
     if not user:
-        return jsonify({'msg': 'El usuario no existe.'}), 404
+        return jsonify({'msg': 'User does not exist'}), 404
     
     favorite = Favorite.query.get(favorite_id)
     if not favorite:
-        return jsonify({'msg': 'Favorito no encontrado.'}), 404
+        return jsonify({'msg': 'Favorite not found'}), 404
     
     if favorite.user_id != user_id:
-        return jsonify({'msg': 'El favorito no pertenece a este usuario.'}), 403
+        return jsonify({'msg': 'This favorite does not belong to User'}), 403
     
     db.session.delete(favorite)
     db.session.commit()
     
-    return jsonify({'msg': 'Favorito eliminado con éxito.'}), 200
+    return jsonify({'msg': 'Success'}), 200
 
 
 @api.route('/favorites/<int:user_id>', methods=['GET'])
@@ -212,7 +212,7 @@ def get_user_favorites(user_id):
 
     user = User.query.get(user_id)
     if not user:
-        return jsonify({'msg': 'El usuario no existe.'}), 404
+        return jsonify({'msg': 'User does not exist'}), 404
     
     favorites = Favorite.query.filter_by(user_id=user_id).all()
     
