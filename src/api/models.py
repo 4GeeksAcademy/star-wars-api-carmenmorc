@@ -53,7 +53,7 @@ class Vehicle(db.Model):
     vehicle_class = db.Column(db.String(120), unique=True, nullable=True)
 
     def __repr__(self):
-        return f'<Character {self.name}>'
+        return f'<Vehicle {self.name}>'
 
     def serialize(self):
         return {
@@ -75,7 +75,7 @@ class Planet(db.Model):
     surface_water = db.Column(db.String(120), unique=True, nullable=True)
 
     def __repr__(self):
-        return f'<Character {self.name}>'
+        return f'<Planet {self.name}>'
 
     def serialize(self):
         return {

@@ -102,7 +102,6 @@ def get_all_characters():
     return jsonify({'msg':'OK',
                     'data' : characters})
 
-
 @api.route('/character/<int:id>', methods=['GET'])
 def get_single_character(id):
     character = Character.query.get(id)
@@ -123,7 +122,6 @@ def get_all_vehicles():
     return jsonify({'msg':'OK',
                     'data' : vehicles})
 
-
 @api.route('/vehicles/<int:id>', methods=['GET'])
 def get_single_vehicle(id):
     vehicles = Vehicle.query.get(id)
@@ -143,7 +141,6 @@ def get_all_planets():
     print(planets)
     return jsonify({'msg':'OK',
                     'data' : planets})
-
 
 @api.route('/planets/<int:id>', methods=['GET'])
 def get_single_planet(id):
