@@ -24,7 +24,6 @@ def handle_hello():
 
 #USUARIO
 
-
 @api.route('/all_users', methods=['GET'])
 def get_all_users():
     users = User.query.all()
@@ -33,7 +32,6 @@ def get_all_users():
     print(users)
     return jsonify({'msg':'OK',
                     'data' : users})
-
 
 #delete 48:44
 @api.route('/delete_user/><int:id>', methods=['DELETE'])
@@ -46,7 +44,6 @@ def delete_user(id):
 
     return jsonify({'msg':'Se eliminó el usuario ' + user.email }), 200
 
-
 #add 54:04
 @api.route('/add_user', methods=['POST'])
 def add_user():
@@ -58,7 +55,6 @@ def add_user():
     db.session.commit()
     
     return jsonify({'msg':'Se creó el usuario', 'data' : data}), 200
-
 
 #put 1:04:19
 @api.route('/deactivate/<int:id>', methods=['PUT'])
@@ -151,6 +147,28 @@ def get_single_planet(id):
         return jsonify({'msg': 'Planet not found'}), 404
     
 
+#TODOS
+
+@api.route('/everything', methods=['GET'])
+def get_everything():
+    #PLANETAS
+    planets = Planet.query.all()
+    print(planets)
+    planets = [pla.serialize() for pla in planets]
+    #PERSONAJES
+    characters = Character.query.all()
+    print(characters)
+    characters = [char.serialize() for char in characters]
+    #VEHICULOS
+    vehicles = Vehicle.query.all()
+    print(vehicles)
+    vehicles = [veh.serialize() for veh in vehicles]
+    #TODOS
+    everything = [characters, planets, vehicles]
+    return jsonify({'msg':'OK',
+                    'data' : everything})
+
+
 #FAVORITOS
 
 @api.route('/add_favorite/<int:user_id>', methods=['POST'])
@@ -180,7 +198,6 @@ def add_favorite(user_id):
     
     return jsonify({'msg': 'Success', 'data': new_favorite.serialize()}), 201
 
-
 @api.route('/delete_favorite/<int:user_id>', methods=['DELETE'])
 def delete_favorite(user_id):
 
@@ -205,7 +222,6 @@ def delete_favorite(user_id):
     db.session.commit()
     
     return jsonify({'msg': 'Success'}), 200
-
 
 @api.route('/favorites/<int:user_id>', methods=['GET'])
 def get_user_favorites(user_id):
