@@ -151,22 +151,27 @@ def get_single_planet(id):
 
 @api.route('/everything', methods=['GET'])
 def get_everything():
-    #PLANETAS
-    planets = Planet.query.all()
-    print(planets)
-    planets = [pla.serialize() for pla in planets]
-    #PERSONAJES
-    characters = Character.query.all()
-    print(characters)
-    characters = [char.serialize() for char in characters]
-    #VEHICULOS
-    vehicles = Vehicle.query.all()
-    print(vehicles)
-    vehicles = [veh.serialize() for veh in vehicles]
-    #TODOS
-    everything = [characters, planets, vehicles]
-    return jsonify({'msg':'OK',
-                    'data' : everything})
+    try:
+        # PLANETAS
+        planets = Planet.query.all()
+        planets = [pla.serialize() for pla in planets]
+
+        # PERSONAJES
+        characters = Character.query.all()
+        characters = [char.serialize() for char in characters]
+
+        # VEHICULOS
+        vehicles = Vehicle.query.all()
+        vehicles = [veh.serialize() for veh in vehicles]
+
+        # TODOS
+        everything = [characters, planets, vehicles]
+        response = jsonify({'msg': 'OK', 'data': everything})
+        print("Response:", response.get_json())
+        return response, 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'msg': 'Server error', 'error': str(e)}), 500
 
 
 #FAVORITOS
