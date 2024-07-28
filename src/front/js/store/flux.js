@@ -69,6 +69,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ favorites: newFavorites });
 			},
 
+			getPeopleDetails: async (uid) => {
+				const response = await fetch(`https://www.swapi.tech/api/people/${uid}`);
+				const data = await response.json();
+				setStore({ peopleDetails: data.result });
+			},
+			
+			getVehiclesDetails: async (uid) => {
+				const response = await fetch(`https://www.swapi.tech/api/vehicles/${uid}`);
+				const data = await response.json();
+				setStore({ vehiclesDetails: data.result });
+			},
+			
+			getPlanetsDetails: async (uid) => {
+				const response = await fetch(`https://www.swapi.tech/api/planets/${uid}`);
+				const data = await response.json();
+				setStore({ planetsDetails: data.result });
+			},
+
 			changeColor: (index, color) => {
 				const store = getStore();
 				const demo = store.demo.map((elm, i) => {

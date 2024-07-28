@@ -1,6 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
+import "../../styles/card.css";
 
 export const Card = ({ name, uid, type }) => {
     const { store, actions } = useContext(Context);
@@ -16,21 +17,31 @@ export const Card = ({ name, uid, type }) => {
     };
 
     return (
-        <div>
-            <div className="card singlecard">
-                <figure className="card-img-top">
-                    <img src={`https://starwars-visualguide.com/assets/img/${type}/${uid}.jpg`} alt={name} />
-                </figure>
-                <figcaption>{name}</figcaption>
-                <div className="card-body">
-                    <h1 className="card-title">{name}</h1>
-                    <p className="card-text">Star Wars: The Force unites Jedi and Sith in an eternal struggle of light versus dark across planets and starships.</p>
-                    <Link to={`/details/${type}/${uid}`} className="btn btn-light cardbtn">Learn More!</Link>
-                    <button className="btn btn-light amarillo cardbtn" onClick={handleFavoriteClick}>
-                        {isFavorite ? '★' : '☆'}
-                    </button>
-                </div>
+        <div className="singlecard">
+            <figure className="card-img-top">
+                <img src={`https://starwars-visualguide.com/assets/img/${type}/${uid}.jpg`} alt={name} />
+            </figure>
+            <figcaption>{name}</figcaption>
+            <div className="card-body">
+                <h1 className="card-title">{name}</h1>
+                <p className="card-text">Star Wars: The Force unites Jedi and Sith in an eternal struggle of light versus dark across planets and starships.</p>
+                <Link to={`/details/${type}/${uid}`} className="btn btn-light cardbtn">Learn More!</Link>
+                <button className="btn btn-light amarillo cardbtn" onClick={handleFavoriteClick}>
+                    {isFavorite ? '★' : '☆'}
+                </button>
             </div>
+        </div>
+    );
+};
+
+export const CardContainer = () => {
+    const { store } = useContext(Context);
+
+    return (
+        <div className="card-container">
+            {store.data.flat().map(item => (
+                <Card key={item.id} name={item.name} uid={item.id} type={getType(item)} />
+            ))}
         </div>
     );
 };
