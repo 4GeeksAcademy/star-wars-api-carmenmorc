@@ -7,13 +7,16 @@ export const Card = ({ name, uid, type }) => {
     const { store, actions } = useContext(Context);
     const [isFavorite, setIsFavorite] = useState(store.favorites.some(fav => fav.uid === uid && fav.type === type));
 
+    useEffect(() => {
+        setIsFavorite(store.favorites.some(fav => fav.uid === uid && fav.type === type));
+    }, [store.favorites]);
+
     const handleFavoriteClick = () => {
         if (isFavorite) {
             actions.removeFavorite(uid);
         } else {
             actions.addFavorite({ name, uid, type });
         }
-        setIsFavorite(!isFavorite);
     };
 
     return (
@@ -44,4 +47,10 @@ export const CardContainer = () => {
             ))}
         </div>
     );
+};
+
+const getType = (item) => {
+    if (item.model) return 'vehicles';
+    if (item.climate) return 'planets';
+    return 'characters';
 };

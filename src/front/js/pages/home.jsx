@@ -1,13 +1,19 @@
 import React, { useContext, useEffect } from "react";
 import { Card } from "../component/card.jsx";
-import { Context } from "../store/appContext";
+import { Context } from "../store/appContext.js";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
     const { store, actions } = useContext(Context);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        actions.fetchAllData();
-    }, []);
+        if (!store.user) {
+            navigate("/login");  // Redirige al login si no hay un usuario logueado
+        } else {
+            actions.fetchAllData();
+        }
+    }, [store.user]);
 
     return (
         <div className="container">

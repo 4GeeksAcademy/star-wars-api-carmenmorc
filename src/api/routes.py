@@ -47,14 +47,26 @@ def delete_user(id):
 #add 54:04
 @api.route('/add_user', methods=['POST'])
 def add_user():
-
     data = request.json
     print(data)
-    new_user = User(email = data['email'], password = data['password'], is_active = True )
+    new_user = User(email=data['username'], password=data['password'], is_active=True)  # Reemplazar email con username
     db.session.add(new_user)
     db.session.commit()
     
     return jsonify({'msg':'Se creó el usuario', 'data' : data}), 200
+
+@api.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('username')
+    password = data.get('password')
+    
+    user = User.query.filter_by(email=email).first()
+    
+    if user and user.password == password:
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401
 
 #put 1:04:19
 @api.route('/deactivate/<int:id>', methods=['PUT'])
