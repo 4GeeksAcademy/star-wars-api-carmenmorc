@@ -5,17 +5,41 @@ import "../../styles/card.css";
 
 export const Card = ({ name, uid, type }) => {
     const { store, actions } = useContext(Context);
-    const [isFavorite, setIsFavorite] = useState(store.favorites.some(fav => fav.uid === uid && fav.type === type));
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
-        setIsFavorite(store.favorites.some(fav => fav.uid === uid && fav.type === type));
-    }, [store.favorites]);
+        console.log("Current store favorites:", store.favorites); // Log para verificar el estado del store
+        const checkFavoriteStatus = () => {
+            const favorite = store.favorites.find(fav => fav.uid === uid && fav.type === type);
+            setIsFavorite(!!favorite);
+        };
+    
+        if (store.favorites) {
+            checkFavoriteStatus();
+        }
+    }, [store.favorites, uid, type]);
+    
 
-    const handleFavoriteClick = () => {
-        if (isFavorite) {
-            actions.removeFavorite(uid);
-        } else {
-            actions.addFavorite({ name, uid, type });
+    const handleFavoriteClick = async () => {
+        try {
+            if (isFavorite) {
+                // Encontrar el ID del favorito que se debe eliminar
+                const favoriteToRemove = store.favorites.find(fav => fav.uid === uid && fav.type === type);
+                if (favoriteToRemove) {
+                    await actions.removeFavorite(favoriteToRemove.id);
+                }
+            } else {
+                const favoriteData = { type, uid };
+                if (type === 'characters') favoriteData.character_id = uid;
+                else if (type === 'planets') favoriteData.planet_id = uid;
+                else if (type === 'vehicles') favoriteData.vehicle_id = uid;
+                await actions.addFavorite(favoriteData);
+            }
+
+            // Actualizar el estado local de favoritos
+            setIsFavorite(prevIsFavorite => !prevIsFavorite);
+        } catch (error) {
+            console.error("Error handling favorite:", error);
         }
     };
 
@@ -35,22 +59,4 @@ export const Card = ({ name, uid, type }) => {
             </div>
         </div>
     );
-};
-
-export const CardContainer = () => {
-    const { store } = useContext(Context);
-
-    return (
-        <div className="card-container">
-            {store.data.flat().map(item => (
-                <Card key={item.id} name={item.name} uid={item.id} type={getType(item)} />
-            ))}
-        </div>
-    );
-};
-
-const getType = (item) => {
-    if (item.model) return 'vehicles';
-    if (item.climate) return 'planets';
-    return 'characters';
 };

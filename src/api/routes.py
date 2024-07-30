@@ -58,13 +58,13 @@ def add_user():
 @api.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    email = data.get('username')
+    email = data.get('email')  # Cambiado a 'email'
     password = data.get('password')
     
     user = User.query.filter_by(email=email).first()
     
     if user and user.password == password:
-        return jsonify({"message": "Login successful"}), 200
+        return jsonify({"message": "Login successful", "user": user.serialize()}), 200  # Añadido 'user' al response
     else:
         return jsonify({"message": "Invalid credentials"}), 401
 
@@ -215,9 +215,9 @@ def add_favorite(user_id):
     
     return jsonify({'msg': 'Success', 'data': new_favorite.serialize()}), 201
 
+
 @api.route('/delete_favorite/<int:user_id>', methods=['DELETE'])
 def delete_favorite(user_id):
-
     data = request.json
 
     favorite_id = data.get('favorite_id')
@@ -240,15 +240,13 @@ def delete_favorite(user_id):
     
     return jsonify({'msg': 'Success'}), 200
 
-@api.route('/favorites/<int:user_id>', methods=['GET'])
-def get_user_favorites(user_id):
 
+@api.route('/get_favorites/<int:user_id>', methods=['GET'])
+def get_favorites(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify({'msg': 'User does not exist'}), 404
-    
+
     favorites = Favorite.query.filter_by(user_id=user_id).all()
-    
-    serialized_favorites = [favorite.serialize() for favorite in favorites]
-    
-    return jsonify({'favorites': serialized_favorites}), 200
+    return jsonify({'favorites': [favorite.serialize() for favorite in favorites]}), 200
+

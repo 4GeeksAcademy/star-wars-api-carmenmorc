@@ -27,7 +27,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             getMessage: async () => {
                 try {
-                    const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
+                    const resp = await fetch("https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/hello");
                     const data = await resp.json();
                     setStore({ message: data.message });
                     return data;
@@ -39,7 +39,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             fetchAllData: async () => {
                 try {
                     console.log("Fetching data...");
-                    const response = await fetch(process.env.BACKEND_URL + "/api/everything");
+                    const response = await fetch("https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/everything");
                     console.log("Response status: ", response.status);
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -65,9 +65,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("No user logged in");
                     return;
                 }
-                
+            
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/add_favorite/${userId}`, {
+                    const response = await fetch(`https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/add_favorite/${userId}`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -76,7 +76,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     });
                     if (response.ok) {
                         const data = await response.json();
+                        console.log("Favorite added:", data.data); // Log para verificar datos añadidos
                         setStore({ favorites: [...store.favorites, data.data] });
+                        console.log("Store favorites after add:", getStore().favorites); // Log para verificar el estado del store
                     } else {
                         console.error("Failed to add favorite");
                     }
@@ -84,28 +86,27 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error adding favorite:", error);
                 }
             },
-
-            removeFavorite: async (uid) => {
+            
+            removeFavorite: async (favorite_id) => {
                 const store = getStore();
                 const userId = store.user ? store.user.id : null;
                 if (!userId) {
                     console.error("No user logged in");
                     return;
                 }
-
-                const favorite = store.favorites.find(fav => fav.uid === uid);
-                if (!favorite) return;
-
+            
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/delete_favorite/${userId}`, {
+                    const response = await fetch(`https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/delete_favorite/${userId}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({ favorite_id: favorite.id })
+                        body: JSON.stringify({ favorite_id })
                     });
                     if (response.ok) {
-                        setStore({ favorites: store.favorites.filter(fav => fav.id !== favorite.id) });
+                        console.log("Favorite ID to remove:", favorite_id); // Log para verificar el ID eliminado
+                        setStore({ favorites: store.favorites.filter(fav => fav.id !== favorite_id) });
+                        console.log("Store favorites after remove:", getStore().favorites); // Log para verificar el estado del store
                     } else {
                         console.error("Failed to remove favorite");
                     }
@@ -113,15 +114,44 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error removing favorite:", error);
                 }
             },
+            
+            
+        
+            fetchFavorites: async () => {
+                const store = getStore();
+                const userId = store.user ? store.user.id : null;
+                if (!userId) {
+                    console.error("No user logged in");
+                    return;
+                }
+            
+                try {
+                    const response = await fetch(`https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/favorites/${userId}`);
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        setStore({ favorites: result.favorites }); // Actualiza el estado de favoritos
+                    } else {
+                        console.error(result.msg || "Failed to fetch favorites");
+                    }
+                } catch (error) {
+                    console.error("Error fetching favorites:", error);
+                }
+            },
+            
+            
+            
+            
+            
 
             login: async (email, password) => {
                 try {
-                    const response = await fetch(process.env.BACKEND_URL + "/api/login", {
+                    const response = await fetch("https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/login", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({ email, password }) // Usar 'email'
+                        body: JSON.stringify({ email, password })
                     });
 
                     if (response.ok) {

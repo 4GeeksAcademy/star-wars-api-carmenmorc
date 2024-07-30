@@ -17,6 +17,11 @@ export const Home = () => {
 
     return (
         <div className="container">
+            {store.user && (
+                <div className="welcome-message">
+                    <h1>Bienvenido {store.user.email}</h1>
+                </div>
+            )}
             <div className="row">
                 {store.characters.map(character => (
                     <Card key={character.id} name={character.name} uid={character.id} type="characters" />

@@ -4,10 +4,9 @@ body {
     background-color: black;
     color: white;
     font-family: 'Courier New', Courier, monospace;
-
 }
 
-h1{
+h1 {
     font-family: "Pixelify Sans", sans-serif;
     font-optical-sizing: auto;
     font-weight: 400;
@@ -15,7 +14,7 @@ h1{
     color: yellow;
 }
 
-figure img{
+figure img {
     border-radius: 5px;
 }
 
@@ -55,16 +54,43 @@ figcaption {
     object-fit: cover; 
 }
 
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+/* Estilo específico para el botón de añadir favorito */
 .amarillo {
     background-color: yellow;
-    margin-left: 10px; 
+    color: black;
+    border: 2px solid black;
+}
+
+/* Estilo específico para el botón de quitar favorito */
+.rojo {
+    background-color: #FF0000;
+    color: white;
+    border: 2px solid black;
 }
 
 .cardbtn {
     font-family: "Pixelify Sans", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
     font-size: 17pt;
     margin-top: 10px; 
+}
+
+.hidden {
+    display: none;
+}
+
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
 }
