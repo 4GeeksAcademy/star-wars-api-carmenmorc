@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import "../../styles/register.css";
 
 export const Register = () => {
     const [username, setUsername] = useState('');
@@ -8,7 +9,7 @@ export const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(`${process.env.BACKEND_URL}/api/add_user`, {  // Verificar que el endpoint sea correcto
+        const response = await fetch(`${process.env.BACKEND_URL}/api/add_user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -18,21 +19,21 @@ export const Register = () => {
 
         if (response.ok) {
             alert('User created successfully!');
-            navigate('/login');  // Redirect to login page after successful registration
+            navigate('/login');
         } else {
             alert('Failed to create user');
         }
     };
 
     return (
-        <div>
-            <h1>Register</h1>
+        <div className="register">
+            <h1>Sign Up</h1>
             <form onSubmit={handleSubmit}>
                 <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 <button type="submit">Register</button>
             </form>
+            <p>Already have an account? <a href="/login">Log in</a></p> {/* Opcional, si quieres un enlace al login */}
         </div>
     );
 };
-

@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import "../../styles/login.css";
 
 export const Login = () => {
     const [email, setEmail] = useState("");
@@ -20,6 +21,7 @@ export const Login = () => {
 
     return (
         <div className="login">
+            <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"

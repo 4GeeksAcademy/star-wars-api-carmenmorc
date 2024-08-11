@@ -9,7 +9,7 @@ export const Home = () => {
 
     useEffect(() => {
         if (!store.user) {
-            navigate("/login");  // Redirige al login si no hay un usuario logueado
+            navigate("/login"); 
         } else {
             actions.fetchAllData();
         }

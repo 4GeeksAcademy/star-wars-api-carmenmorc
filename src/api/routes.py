@@ -220,20 +220,23 @@ def add_favorite(user_id):
 def delete_favorite(user_id):
     data = request.json
 
-    favorite_id = data.get('favorite_id')
-    if not favorite_id:
-        return jsonify({'msg': 'favorite_id is obligatory'}), 400
+    planet_id = data.get('planet_id')
+    character_id = data.get('character_id')
+    vehicle_id = data.get('vehicle_id')
+    
+    if not any([planet_id, character_id, vehicle_id]):
+        return jsonify({'msg': 'At least one of the fields (planet_id, character_id, vehicle_id) must be provided'}), 400
 
     user = User.query.get(user_id)
     if not user:
         return jsonify({'msg': 'User does not exist'}), 404
     
-    favorite = Favorite.query.get(favorite_id)
+    favorite = Favorite.query.filter_by(user_id=user_id, 
+                                        planet_id=planet_id,
+                                        character_id=character_id, 
+                                        vehicle_id=vehicle_id).first()
     if not favorite:
         return jsonify({'msg': 'Favorite not found'}), 404
-    
-    if favorite.user_id != user_id:
-        return jsonify({'msg': 'This favorite does not belong to User'}), 403
     
     db.session.delete(favorite)
     db.session.commit()

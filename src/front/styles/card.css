@@ -62,19 +62,18 @@ figcaption {
     cursor: pointer;
     border: none;
     border-radius: 5px;
+    margin: 4px;
 }
 
-/* Estilo específico para el botón de añadir favorito */
 .amarillo {
     background-color: yellow;
     color: black;
     border: 2px solid black;
 }
 
-/* Estilo específico para el botón de quitar favorito */
 .rojo {
-    background-color: #FF0000;
-    color: white;
+    background-color: white;
+    color: black;
     border: 2px solid black;
 }
 
@@ -86,11 +85,4 @@ figcaption {
 
 .hidden {
     display: none;
-}
-
-
-.error-message {
-    color: red;
-    margin-top: 10px;
-    font-weight: bold;
 }

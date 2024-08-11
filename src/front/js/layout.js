@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 import { Home } from "./pages/home.jsx";
@@ -8,6 +8,7 @@ import { Register } from "./component/Register.jsx";
 import { Login } from "./component/Login.jsx";
 import { Favorites } from "./component/favorites.jsx";
 import injectContext, { Context } from "./store/appContext";
+import { Navbar } from "./component/Navbar.jsx"; 
 
 const Layout = () => {
     const { store, actions } = useContext(Context);
@@ -18,7 +19,7 @@ const Layout = () => {
         <div>
             <BrowserRouter basename={process.env.BASENAME || ""}>
                 <ScrollToTop>
-                    {store.user && <button onClick={actions.logout}>Logout</button>}  // Botón de logout
+                    <Navbar />
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/details/characters/:uid" element={<Details />} />

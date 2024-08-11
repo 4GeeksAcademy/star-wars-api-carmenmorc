@@ -107,10 +107,20 @@ class Favorite(db.Model):
         db.session.commit()
     
     def serialize(self):
-        return {
+        favorite_data = {
             "id": self.id,
             "user_id": self.user_id,
             "planet_id": self.planet_id,
             "character_id": self.character_id,
             "vehicle_id": self.vehicle_id
         }
+        if self.planet:
+            favorite_data["name"] = self.planet.name
+            favorite_data["type"] = "planet"
+        elif self.character:
+            favorite_data["name"] = self.character.name
+            favorite_data["type"] = "character"
+        elif self.vehicle:
+            favorite_data["name"] = self.vehicle.name
+            favorite_data["type"] = "vehicle"
+        return favorite_data

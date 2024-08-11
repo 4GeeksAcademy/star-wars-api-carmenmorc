@@ -18,7 +18,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     background: "white",
                     initial: "white"
                 }
-            ]
+            ],
+            peopleDetails: null,
+            vehiclesDetails: null,
+            planetsDetails: null
         },
         actions: {
             exampleFunction: () => {
@@ -27,7 +30,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             getMessage: async () => {
                 try {
-                    const resp = await fetch("https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/hello");
+                    const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
                     const data = await resp.json();
                     setStore({ message: data.message });
                     return data;
@@ -39,114 +42,130 @@ const getState = ({ getStore, getActions, setStore }) => {
             fetchAllData: async () => {
                 try {
                     console.log("Fetching data...");
-                    const response = await fetch("https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/everything");
-                    console.log("Response status: ", response.status);
+                    const response = await fetch(process.env.BACKEND_URL + "/api/everything");
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     const result = await response.json();
-                    console.log("Fetched data: ", result);
                     const [characters, planets, vehicles] = result.data;
                     setStore({
                         characters,
                         planets,
                         vehicles
                     });
-                    console.log("Store after fetch: ", getStore());
                 } catch (error) {
                     console.error("Error fetching data: ", error);
                 }
             },
 
-            addFavorite: async (favorite) => {
+            addFavorite: async ({ type, uid }) => {
                 const store = getStore();
                 const userId = store.user ? store.user.id : null;
+
                 if (!userId) {
                     console.error("No user logged in");
-                    return;
+                    return false;
                 }
-            
+
+                let favoriteData = {};
+                if (type === 'characters') favoriteData.character_id = uid;
+                else if (type === 'planets') favoriteData.planet_id = uid;
+                else if (type === 'vehicles') favoriteData.vehicle_id = uid;
+
                 try {
-                    const response = await fetch(`https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/add_favorite/${userId}`, {
+                    console.log("Adding favorite:", favoriteData);
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/add_favorite/${userId}`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify(favorite)
+                        body: JSON.stringify(favoriteData)
                     });
+
                     if (response.ok) {
                         const data = await response.json();
-                        console.log("Favorite added:", data.data); // Log para verificar datos añadidos
                         setStore({ favorites: [...store.favorites, data.data] });
-                        console.log("Store favorites after add:", getStore().favorites); // Log para verificar el estado del store
+                        return true;
                     } else {
-                        console.error("Failed to add favorite");
+                        console.error("Failed to add favorite", response.status);
+                        return false;
                     }
                 } catch (error) {
                     console.error("Error adding favorite:", error);
+                    return false;
                 }
             },
-            
-            removeFavorite: async (favorite_id) => {
+
+            removeFavorite: async (favorite) => {
                 const store = getStore();
                 const userId = store.user ? store.user.id : null;
+            
                 if (!userId) {
                     console.error("No user logged in");
-                    return;
+                    return false;
                 }
             
                 try {
-                    const response = await fetch(`https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/delete_favorite/${userId}`, {
+                    console.log("Removing favorite:", favorite);
+                    let favoriteData = {};
+                    if (favorite.character_id) favoriteData.character_id = favorite.character_id;
+                    if (favorite.planet_id) favoriteData.planet_id = favorite.planet_id;
+                    if (favorite.vehicle_id) favoriteData.vehicle_id = favorite.vehicle_id;
+            
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/delete_favorite/${userId}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({ favorite_id })
+                        body: JSON.stringify(favoriteData)
                     });
+            
                     if (response.ok) {
-                        console.log("Favorite ID to remove:", favorite_id); // Log para verificar el ID eliminado
-                        setStore({ favorites: store.favorites.filter(fav => fav.id !== favorite_id) });
-                        console.log("Store favorites after remove:", getStore().favorites); // Log para verificar el estado del store
+                        setStore({
+                            favorites: store.favorites.filter(
+                                fav =>
+                                    fav.character_id !== favorite.character_id &&
+                                    fav.planet_id !== favorite.planet_id &&
+                                    fav.vehicle_id !== favorite.vehicle_id
+                            )
+                        });
+                        return true;
                     } else {
-                        console.error("Failed to remove favorite");
+                        console.error("Failed to remove favorite", response.status);
+                        return false;
                     }
                 } catch (error) {
                     console.error("Error removing favorite:", error);
+                    return false;
                 }
             },
             
-            
-        
-            fetchFavorites: async () => {
+            loadFavorites: async () => {
                 const store = getStore();
                 const userId = store.user ? store.user.id : null;
+
                 if (!userId) {
                     console.error("No user logged in");
                     return;
                 }
-            
+
                 try {
-                    const response = await fetch(`https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/favorites/${userId}`);
-                    const result = await response.json();
-                    
+                    console.log("Loading favorites for user ID:", userId);
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/get_favorites/${userId}`);
                     if (response.ok) {
-                        setStore({ favorites: result.favorites }); // Actualiza el estado de favoritos
+                        const data = await response.json();
+                        setStore({ favorites: data.favorites });
                     } else {
-                        console.error(result.msg || "Failed to fetch favorites");
+                        console.error("Failed to load favorites", response.status);
                     }
                 } catch (error) {
-                    console.error("Error fetching favorites:", error);
+                    console.error("Error loading favorites:", error);
                 }
             },
-            
-            
-            
-            
-            
 
             login: async (email, password) => {
                 try {
-                    const response = await fetch("https://expert-chainsaw-5gvppwpqqx9whrwr-3001.app.github.dev/api/login", {
+                    const response = await fetch(process.env.BACKEND_URL + "/api/login", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -166,6 +185,55 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } catch (error) {
                     console.error("Error during login:", error);
                     return false;
+                }
+            },
+
+            getPeopleDetails: async (id) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/character/${id}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log("People Details:", result.data); // Agrega este log
+                        setStore({
+                            peopleDetails: result.data
+                        });
+                    } else {
+                        console.error("Failed to fetch people details:", result.msg);
+                    }
+                } catch (error) {
+                    console.error("Error fetching people details:", error);
+                }
+            },
+
+            getVehiclesDetails: async (id) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/vehicles/${id}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        setStore({
+                            vehiclesDetails: result.data
+                        });
+                    } else {
+                        console.error("Failed to fetch vehicle details:", result.msg);
+                    }
+                } catch (error) {
+                    console.error("Error fetching vehicle details:", error);
+                }
+            },
+
+            getPlanetsDetails: async (id) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/planets/${id}`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        setStore({
+                            planetsDetails: result.data
+                        });
+                    } else {
+                        console.error("Failed to fetch planet details:", result.msg);
+                    }
+                } catch (error) {
+                    console.error("Error fetching planet details:", error);
                 }
             },
         }
